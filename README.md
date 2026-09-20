@@ -1,161 +1,164 @@
 # Course Platform API
 
-A Laravel 13 REST API for a course platform with authentication, role-based authorization, course management, social interactions, moderation, and automated tests.
+Laravel 13 REST API for a course platform with authentication, role-based authorization, course management, moderation, likes, comments, file uploads, and automated tests.
 
-**Frontend:** [junior-frontend-app](https://github.com/artushhhd/junior-frontend-app)
-
-## What this project demonstrates
-
-- Designing a REST API with Laravel 13
-- Token authentication with Laravel Sanctum
-- Request validation and protected routes
-- Role-based access control with a staff hierarchy
-- Resource ownership and authorization rules
-- CRUD operations with Eloquent ORM
-- Image upload and storage management
-- Likes and comments
-- Admin moderation and user management
-- Pagination for administrative collections
-- Feature testing with PHPUnit
-- Separation of routing, controllers, requests, models, middleware, policies and database schema
+**Frontend:** https://github.com/artushhhd/junior-frontend-app
 
 ## Tech Stack
 
-| Technology | Usage |
-|---|---|
-| PHP 8.3+ | Backend |
-| Laravel 13 | REST API framework |
-| Laravel Sanctum 4 | Token authentication |
-| Eloquent ORM | Database access |
-| MySQL / SQLite | Database |
-| PHPUnit | Automated tests |
-| Vite | Laravel frontend tooling |
+- PHP 8.3+
+- Laravel 13.8
+- Laravel Sanctum 4
+- Eloquent ORM
+- MySQL / SQLite
+- PHPUnit
+- REST API
 
-## Core Features
+## Key Features
 
 ### Authentication
 
-- User registration and login
+- Registration, login, logout
 - Sanctum bearer-token authentication
-- Authenticated profile endpoint
-- Logout
+- Authenticated profile
 - Rate limiting on registration and login
-- Active/inactive account state
-- Blocked users cannot authenticate
+- Blocked accounts cannot authenticate
+
+### Authorization
+
+Four roles are supported:
+
+```text
+user
+moderator
+admin
+superadmin
+```
+
+Authorization is enforced on the API using middleware and Laravel Policies.
+
+- Users can manage their own courses.
+- Moderators can moderate courses within their authorization scope.
+- Admin actions are restricted by role hierarchy.
+- Frontend role checks are only for UI behavior; the API remains the source of truth.
 
 ### Courses
 
-- Create, read, update and delete courses
-- Course ownership checks
-- Image upload and storage
-- Like / unlike
-- Comments
+- CRUD operations
+- Ownership validation
+- Image uploads
 - Course status and moderation
-- Paginated admin course listing
+- Likes / unlike
+- Comments
+- Pagination
 
-### Roles & Authorization
+### Administration
 
-The API supports four roles:
+- Course moderation and approval
+- User listing
+- Account blocking
+- User deletion
+- Administrative course management
 
-- `user`
-- `moderator`
-- `admin`
-- `superadmin`
-
-Authorization is enforced on the backend rather than relying on the frontend.
-
-Examples of the role hierarchy:
-
-- Moderators can moderate courses but cannot manage users.
-- Moderators cannot manage courses created by admins or superadmins.
-- Admins can manage users, but cannot manage other admins or superadmins.
-- Only a superadmin can manage a superadmin account.
-
-The frontend role checks are therefore only a UI concern; the API remains the source of truth for authorization.
-
-## API Overview
+## API
 
 ### Public
 
-```text
-POST   /api/register
-POST   /api/login
+```http
+POST /api/register
+POST /api/login
 
-GET    /api/courses
-GET    /api/courses/{id}
+GET /api/courses
+GET /api/courses/{course}
 ```
 
 ### Authenticated
 
-```text
-GET    /api/user
-GET    /api/profile
-POST   /api/logout
+```http
+GET /api/user
+GET /api/profile
+POST /api/logout
 
-POST   /api/courses
-PUT    /api/courses/{id}
-PATCH  /api/courses/{id}
-DELETE /api/courses/{id}
+POST /api/courses
+PUT /api/courses/{course}
+PATCH /api/courses/{course}
+DELETE /api/courses/{course}
 
-POST   /api/courses/{id}/like
-POST   /api/courses/{id}/comment
+POST /api/courses/{course}/like
+POST /api/courses/{course}/comment
 ```
 
 ### Administration
 
-```text
-GET    /api/admin/courses
-POST   /api/admin/courses/{id}/approve
-POST   /api/admin/courses/{id}
-DELETE /api/admin/courses/{id}
+```http
+GET /api/admin/courses
+POST /api/admin/courses/{course}/approve
+POST /api/admin/courses/{course}
+DELETE /api/admin/courses/{course}
 
-GET    /api/admin/users
-POST   /api/admin/users/{id}/toggle-block
-DELETE /api/admin/users/{id}
+GET /api/admin/users
+POST /api/admin/users/{user}/toggle-block
+DELETE /api/admin/users/{user}
 ```
 
-All administrative routes are protected by authentication and the backend admin middleware.
+Authenticated endpoints use Sanctum. Administrative endpoints additionally require the appropriate staff authorization.
 
 ## Architecture
 
-The project keeps responsibilities separated:
+Responsibilities are separated between HTTP handling, validation, authorization, persistence, and routing.
 
 ```text
 app/
 ├── Http/
-│   ├── Controllers/    # HTTP/API orchestration
-│   ├── Middleware/     # Authentication and staff access
-│   └── Requests/       # Input validation
-├── Models/             # Eloquent models and relationships
-└── Policies/           # Resource authorization
-
-routes/
-└── api.php             # API entry points
+│   ├── Controllers/
+│   ├── Middleware/
+│   └── Requests/
+├── Models/
+└── Policies/
 
 database/
-├── migrations/         # Database schema
-├── factories/          # Test data
-└── seeders/            # Initial data
+├── factories/
+├── migrations/
+└── seeders/
+
+routes/
+└── api.php
 
 tests/
-└── Feature/            # API behaviour and authorization tests
+└── Feature/
 ```
 
-The frontend is intentionally kept as a separate application so the API can be consumed independently.
+| Layer | Responsibility |
+|---|---|
+| Controllers | HTTP request orchestration |
+| Form Requests | Input validation |
+| Middleware | Authentication / staff access |
+| Policies | Resource authorization |
+| Models | Database relationships and persistence |
+| Migrations | Database schema |
+| Seeders | Development data |
+| Feature Tests | API behavior and authorization |
 
 ## Testing
 
-Run the complete test suite with:
+Run:
 
 ```bash
 php artisan test
 ```
 
-The test suite covers API behaviour such as course operations, validation, authorization, likes and other application rules.
+Feature tests cover authentication, course operations, validation, authorization, and other API behavior.
 
 ## Installation
 
-### 1. Clone the repository
+### Requirements
+
+- PHP 8.3+
+- Composer
+- Node.js / npm
+- SQLite or MySQL
+
+### 1. Clone
 
 ```bash
 git clone https://github.com/artushhhd/junior-backend-api.git
@@ -169,28 +172,22 @@ composer install
 npm install
 ```
 
-### 3. Configure the environment
+### 3. Configure environment
 
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-The example environment is configured for SQLite by default. MySQL can be used by changing the `DB_*` variables in `.env`.
-
 ### 4. Prepare the database
 
-```bash
-php artisan migrate
-```
-
-If you want the seeded development data:
+For a fresh development database with seed data:
 
 ```bash
 php artisan migrate:fresh --seed
 ```
 
-### 5. Link public storage
+### 5. Link storage
 
 ```bash
 php artisan storage:link
@@ -202,7 +199,7 @@ php artisan storage:link
 php artisan serve
 ```
 
-The default API server is:
+Default local API:
 
 ```text
 http://127.0.0.1:8000
@@ -210,16 +207,23 @@ http://127.0.0.1:8000
 
 ## Frontend
 
-The matching Next.js application is available here:
+The matching Next.js application:
 
-**[junior-frontend-app](https://github.com/artushhhd/junior-frontend-app)**
+https://github.com/artushhhd/junior-frontend-app
 
-It consumes this API through a centralized JavaScript API client and environment-based configuration.
+The frontend consumes this API through a centralized API client.
 
-## Project Status
+## Project Purpose
 
-This is a portfolio project focused on demonstrating practical backend development with Laravel: API design, authentication, authorization, validation, persistence, file storage, moderation and testing.
+This portfolio project demonstrates practical Laravel backend development:
 
+- REST API design
+- Authentication and authorization
+- Database relationships
+- Validation
+- File storage
+- Moderation
+- Automated testing
+- Separation of application responsibilities
 
-
-> **Active portfolio version:** This is the current implementation of the Course Platform API. Historical development is preserved in `BackVibeCoding`.
+The project is intended as a portfolio demonstration rather than a production SaaS application.
