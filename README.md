@@ -1,32 +1,38 @@
 # Course Platform API
 
-Laravel 13 REST API for a course platform with authentication, role-based authorization, course management, moderation, likes, comments, file uploads, and automated tests.
+Laravel 13 REST API for a course platform with authentication, role-based authorization, course management, moderation, media uploads, likes, comments, and feature tests.
 
 **Frontend:** https://github.com/artushhhd/junior-frontend-app
+
+## Overview
+
+The Course Platform is a full-stack application split into independent Laravel and Next.js projects. This repository contains the backend API and its application rules.
+
+The project focuses on REST API design, resource authorization, validation, database relationships, file handling, and automated API testing.
 
 ## Tech Stack
 
 - PHP 8.3+
-- Laravel 13.8
+- Laravel 13
 - Laravel Sanctum 4
 - Eloquent ORM
 - MySQL / SQLite
 - PHPUnit
 - REST API
 
-## Key Features
+## Core Features
 
 ### Authentication
 
-- Registration, login, logout
+- Registration, login, and logout
 - Sanctum bearer-token authentication
 - Authenticated profile
-- Rate limiting on registration and login
+- Login and registration rate limiting
 - Blocked accounts cannot authenticate
 
 ### Authorization
 
-Four roles are supported:
+The API supports four roles:
 
 ```text
 user
@@ -35,20 +41,20 @@ admin
 superadmin
 ```
 
-Authorization is enforced on the API using middleware and Laravel Policies.
+Authorization is enforced server-side through middleware and Laravel Policies.
 
-- Users can manage their own courses.
-- Moderators can moderate courses within their authorization scope.
-- Admin actions are restricted by role hierarchy.
-- Frontend role checks are only for UI behavior; the API remains the source of truth.
+- Users can manage resources they own
+- Moderators can perform authorized moderation actions
+- Administrative actions are restricted by role
+- Frontend role checks affect UI behavior only; the API remains the security boundary
 
 ### Courses
 
-- CRUD operations
+- Course CRUD
 - Ownership validation
 - Image uploads
 - Course status and moderation
-- Likes / unlike
+- Likes and unlike
 - Comments
 - Pagination
 
@@ -60,7 +66,7 @@ Authorization is enforced on the API using middleware and Laravel Policies.
 - User deletion
 - Administrative course management
 
-## API
+## API Surface
 
 ### Public
 
@@ -101,7 +107,7 @@ POST /api/admin/users/{user}/toggle-block
 DELETE /api/admin/users/{user}
 ```
 
-Authenticated endpoints use Sanctum. Administrative endpoints additionally require the appropriate staff authorization.
+Authenticated endpoints use Sanctum, while administrative endpoints require the corresponding server-side authorization.
 
 ## Architecture
 
@@ -132,74 +138,49 @@ tests/
 |---|---|
 | Controllers | HTTP request orchestration |
 | Form Requests | Input validation |
-| Middleware | Authentication / staff access |
+| Middleware | Authentication and access control |
 | Policies | Resource authorization |
-| Models | Database relationships and persistence |
+| Models | Relationships and persistence |
 | Migrations | Database schema |
 | Seeders | Development data |
 | Feature Tests | API behavior and authorization |
 
 ## Testing
 
-Run:
+Run the feature test suite with:
 
 ```bash
 php artisan test
 ```
 
-Feature tests cover authentication, course operations, validation, authorization, and other API behavior.
+The tests cover authentication, course operations, validation, authorization, and other API behavior.
 
-## Installation
+## Local Development
 
 ### Requirements
 
 - PHP 8.3+
 - Composer
 - Node.js / npm
-- SQLite or MySQL
+- MySQL or SQLite
 
-### 1. Clone
+### Installation
 
 ```bash
 git clone https://github.com/artushhhd/junior-backend-api.git
 cd junior-backend-api
-```
 
-### 2. Install dependencies
-
-```bash
 composer install
 npm install
-```
 
-### 3. Configure environment
-
-```bash
 cp .env.example .env
 php artisan key:generate
-```
-
-### 4. Prepare the database
-
-For a fresh development database with seed data:
-
-```bash
 php artisan migrate:fresh --seed
-```
-
-### 5. Link storage
-
-```bash
 php artisan storage:link
-```
-
-### 6. Start the API
-
-```bash
 php artisan serve
 ```
 
-Default local API:
+The API runs at:
 
 ```text
 http://127.0.0.1:8000
@@ -207,23 +188,14 @@ http://127.0.0.1:8000
 
 ## Frontend
 
-The matching Next.js application:
+The corresponding Next.js client is maintained separately:
 
 https://github.com/artushhhd/junior-frontend-app
 
-The frontend consumes this API through a centralized API client.
+The frontend communicates with this API through a centralized API client and uses the backend as the source of truth for authorization.
 
-## Project Purpose
+## Project Structure
 
-This portfolio project demonstrates practical Laravel backend development:
+The repository follows Laravel conventions and keeps HTTP handling, validation, authorization, persistence, database changes, seed data, and feature tests in their respective layers.
 
-- REST API design
-- Authentication and authorization
-- Database relationships
-- Validation
-- File storage
-- Moderation
-- Automated testing
-- Separation of application responsibilities
-
-The project is intended as a portfolio demonstration rather than a production SaaS application.
+This project is a portfolio application demonstrating practical Laravel backend development rather than a production SaaS platform.
