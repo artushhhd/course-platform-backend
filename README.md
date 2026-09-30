@@ -1,14 +1,14 @@
 # Course Platform API
 
-Laravel 13 REST API for a course platform with authentication, role-based authorization, course management, moderation, media uploads, likes, comments, and feature tests.
+Laravel 13 REST API for a full-stack course platform with authentication, role-based authorization, course management, moderation, media uploads, likes, comments, and feature tests.
 
-**Frontend:** https://github.com/artushhhd/junior-frontend-app
+**Frontend:** https://github.com/artushhhd/course-platform-frontend
 
 ## Overview
 
-The Course Platform is a full-stack application split into independent Laravel and Next.js projects. This repository contains the backend API and its application rules.
+The Course Platform is split into independent Laravel and Next.js applications. This repository contains the backend API responsible for business rules, validation, authorization, persistence, and file handling.
 
-The project focuses on REST API design, resource authorization, validation, database relationships, file handling, and automated API testing.
+The project demonstrates practical backend patterns including REST API design, Laravel Policies, Form Requests, Eloquent relationships, role-based access control, media handling, and automated feature testing.
 
 ## Tech Stack
 
@@ -28,25 +28,20 @@ The project focuses on REST API design, resource authorization, validation, data
 - Sanctum bearer-token authentication
 - Authenticated profile
 - Login and registration rate limiting
-- Blocked accounts cannot authenticate
+- Blocked-account protection
 
 ### Authorization
 
 The API supports four roles:
 
-```text
-user
-moderator
-admin
-superadmin
-```
+`user`, `moderator`, `admin`, and `superadmin`.
 
 Authorization is enforced server-side through middleware and Laravel Policies.
 
-- Users can manage resources they own
-- Moderators can perform authorized moderation actions
-- Administrative actions are restricted by role
-- Frontend role checks affect UI behavior only; the API remains the security boundary
+- Resource ownership checks
+- Role-based administrative access
+- Moderation permissions
+- Backend remains the security boundary
 
 ### Courses
 
@@ -54,7 +49,7 @@ Authorization is enforced server-side through middleware and Laravel Policies.
 - Ownership validation
 - Image uploads
 - Course status and moderation
-- Likes and unlike
+- Like / unlike
 - Comments
 - Pagination
 
@@ -99,15 +94,12 @@ POST /api/courses/{course}/comment
 ```http
 GET /api/admin/courses
 POST /api/admin/courses/{course}/approve
-POST /api/admin/courses/{course}
-DELETE /api/admin/courses/{course}
-
 GET /api/admin/users
 POST /api/admin/users/{user}/toggle-block
 DELETE /api/admin/users/{user}
 ```
 
-Authenticated endpoints use Sanctum, while administrative endpoints require the corresponding server-side authorization.
+Administrative endpoints require the corresponding server-side authorization.
 
 ## Architecture
 
@@ -147,13 +139,13 @@ tests/
 
 ## Testing
 
-Run the feature test suite with:
+Run:
 
 ```bash
 php artisan test
 ```
 
-The tests cover authentication, course operations, validation, authorization, and other API behavior.
+The feature suite covers authentication, course operations, validation, authorization, and API behavior.
 
 ## Local Development
 
@@ -161,21 +153,18 @@ The tests cover authentication, course operations, validation, authorization, an
 
 - PHP 8.3+
 - Composer
-- Node.js / npm
 - MySQL or SQLite
 
 ### Installation
 
 ```bash
-git clone https://github.com/artushhhd/junior-backend-api.git
-cd junior-backend-api
+git clone https://github.com/artushhhd/course-platform-backend.git
+cd course-platform-backend
 
 composer install
-npm install
-
 cp .env.example .env
 php artisan key:generate
-php artisan migrate:fresh --seed
+php artisan migrate --seed
 php artisan storage:link
 php artisan serve
 ```
@@ -190,12 +179,10 @@ http://127.0.0.1:8000
 
 The corresponding Next.js client is maintained separately:
 
-https://github.com/artushhhd/junior-frontend-app
+https://github.com/artushhhd/course-platform-frontend
 
-The frontend communicates with this API through a centralized API client and uses the backend as the source of truth for authorization.
+The frontend communicates with this API through a centralized API client and relies on the backend as the source of truth for authorization.
 
-## Project Structure
+## Project Scope
 
-The repository follows Laravel conventions and keeps HTTP handling, validation, authorization, persistence, database changes, seed data, and feature tests in their respective layers.
-
-This project is a portfolio application demonstrating practical Laravel backend development rather than a production SaaS platform.
+This is a portfolio application focused on demonstrating practical Laravel backend development, API architecture, authorization, database relationships, file handling, and testing.
