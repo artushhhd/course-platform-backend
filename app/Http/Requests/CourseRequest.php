@@ -18,17 +18,15 @@ class CourseRequest extends FormRequest
         $isPost = $this->isMethod('post');
 
         return [
-            'title'        => [$isPost ? 'required' : 'sometimes', 'string', 'max:255'],
-            'slug'         => ['nullable', 'string', 'max:255'],
-            'description'  => ['nullable', 'string'],
-            'price'        => [$isPost ? 'required' : 'sometimes', 'numeric', 'min:0'],
-            'status'       => [$isPost ? 'required' : 'sometimes', 'in:draft,published,archived'],
-            'published_at' => ['nullable', 'date'],
-            'image'        => [
+            'title'       => [$isPost ? 'required' : 'sometimes', 'string', 'max:255'],
+            'slug'        => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'price'       => [$isPost ? 'required' : 'sometimes', 'numeric', 'min:0'],
+            'image'       => [
                 'nullable',
                 'image',
-                'mimes:jpg,jpeg,png,webp,svg',
-                'max:2048'
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
             ],
         ];
     }
