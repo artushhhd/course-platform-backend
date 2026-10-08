@@ -39,11 +39,10 @@ class AdminController extends Controller
 
     public function destroyCourse(Course $course): JsonResponse
     {
-        $currentUser = Auth::user();
         $course->load('author:id,role');
 
-        if ($course->author?->isSuperAdmin() && !$currentUser->isSuperAdmin()) {
-            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+        if ($response = $this->guardAgainstManagingCourse($course)) {
+            return $response;
         }
 
         if ($course->image) {
@@ -57,7 +56,16 @@ class AdminController extends Controller
 
     public function approve(Course $course): JsonResponse
     {
-        $course->update(['status' => 'published']);
+        $course->load('author:id,role');
+
+        if ($response = $this->guardAgainstManagingCourse($course)) {
+            return $response;
+        }
+
+        $course->update([
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
 
         return response()->json(['success' => true, 'course' => $course]);
     }
@@ -115,6 +123,25 @@ class AdminController extends Controller
     private function abortIfModeratorOnly(): void
     {
         abort_if($this->isModeratorOnly(Auth::user()), 403);
+    }
+
+    private function guardAgainstManagingCourse(Course $course): ?JsonResponse
+    {
+        $currentUser = Auth::user();
+        $author = $course->author;
+
+        if ($this->isModeratorOnly($currentUser) && $author && $author->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Moderators cannot manage courses created by admins.',
+            ], 403);
+        }
+
+        if ($author?->isSuperAdmin() && !$currentUser->isSuperAdmin()) {
+            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+        }
+
+        return null;
     }
 
     private function guardAgainstManagingStaff(User $target, string $adminMessage): ?JsonResponse
