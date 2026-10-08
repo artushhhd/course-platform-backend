@@ -58,6 +58,8 @@ class CourseController extends Controller
         $data = $request->validated();
         $data['user_id'] = $request->user()->id;
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title']);
+        $data['status'] = 'draft';
+        $data['published_at'] = null;
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('courses', 'public');
