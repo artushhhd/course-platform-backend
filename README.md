@@ -79,6 +79,10 @@ php artisan serve
 
 The API is served at `http://127.0.0.1:8000` by default. Keep credentials and secrets in your local `.env` file.
 
+## Development-only seed data
+
+The database seeder creates demo accounts with short, predictable passwords for local testing. Use these accounts only in a disposable local database. Do not seed them into a public or production environment; replace or remove demo credentials before deployment.
+
 ## Tests
 
 ```bash
