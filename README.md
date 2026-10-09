@@ -1,69 +1,88 @@
 # Course Platform API
 
-Laravel 13 REST API for a learning platform, focused on authentication, RBAC, server-side authorization, moderation, media handling, relational data, and feature testing.
+Laravel REST API for a learning platform, focused on authentication, role-based access control, course workflows, moderation, media handling, and feature testing.
 
-**Frontend:** https://github.com/artushhhd/course-platform-frontend
+**Frontend:** [course-platform-frontend](https://github.com/artushhhd/course-platform-frontend)
 
-## Highlights
+## Features
 
-- Laravel 13 REST API
-- Sanctum authentication
-- RBAC: user, moderator, admin, superadmin
+- Laravel Sanctum authentication
+- Role-based access control: user, moderator, admin, superadmin
 - Policy-based authorization and ownership checks
 - Form Request validation
-- Course CRUD, moderation, and image uploads
+- Course creation, updates, deletion, and moderation
+- Image uploads and storage integration
 - Likes, comments, and pagination
-- Administrative user/course management
+- Administrative user and course workflows
 - PHPUnit feature tests
 
-## Stack
+## Technology
 
-PHP 8.3+ · Laravel 13 · Sanctum · Eloquent · MySQL / SQLite · PHPUnit
+PHP 8.3+ · Laravel 13 · Sanctum · Eloquent ORM · MySQL / SQLite · PHPUnit
 
-## Architecture
+## Request Flow
 
 ```text
-Request -> Middleware/Auth -> Controller -> Form Request -> Policy -> Eloquent -> Database/Storage
+HTTP request
+  -> routing and middleware
+  -> authentication
+  -> request validation
+  -> policy / authorization
+  -> controller and response
+  -> Eloquent
+  -> database or storage
 ```
 
-Security is enforced on the API, not by frontend visibility.
+The backend is the security boundary. Client-side visibility does not replace server-side authorization.
 
-## API
+## Main API Routes
 
-```http
-POST /api/register
-POST /api/login
-GET  /api/courses
-GET  /api/courses/{course}
-GET  /api/profile
-POST /api/logout
-POST /api/courses
-PUT /api/courses/{course}
-DELETE /api/courses/{course}
-POST /api/courses/{course}/like
-POST /api/courses/{course}/comment
-GET /api/admin/courses
-POST /api/admin/courses/{course}/approve
-GET /api/admin/users
-POST /api/admin/users/{user}/toggle-block
-DELETE /api/admin/users/{user}
-```
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/api/register` | Register |
+| POST | `/api/login` | Authenticate |
+| POST | `/api/logout` | End session |
+| GET | `/api/profile` | Current profile |
+| GET | `/api/courses` | Browse courses |
+| GET | `/api/courses/{course}` | View course |
+| POST | `/api/courses` | Create course |
+| PUT | `/api/courses/{course}` | Update course |
+| DELETE | `/api/courses/{course}` | Delete course |
+| POST | `/api/courses/{course}/like` | Like course |
+| POST | `/api/courses/{course}/comment` | Comment on course |
+| GET | `/api/admin/courses` | Admin course workflow |
+| POST | `/api/admin/courses/{course}/approve` | Approve course |
+| GET | `/api/admin/users` | List users |
+| POST | `/api/admin/users/{user}/toggle-block` | Toggle user block |
+| DELETE | `/api/admin/users/{user}` | Delete user |
 
-## Testing
-
-```bash
-php artisan test
-```
+Verify route definitions in the application if you need an exhaustive or version-specific API reference.
 
 ## Run Locally
+
+Requirements: PHP, Composer, and a configured MySQL or SQLite database.
 
 ```bash
 git clone https://github.com/artushhhd/course-platform-backend.git
 cd course-platform-backend
 composer install
-cp .env.example .env
+```
+
+Copy `.env.example` to `.env` (use `cp` on macOS/Linux or `copy` in Windows Command Prompt), configure the database, and then run:
+
+```bash
 php artisan key:generate
 php artisan migrate --seed
 php artisan storage:link
 php artisan serve
 ```
+
+The API is served at `http://127.0.0.1:8000` by default. Keep credentials and secrets in your local `.env` file.
+
+## Tests
+
+```bash
+php artisan test
+```
+
+See the [frontend README](https://github.com/artushhhd/course-platform-frontend) for client setup.
