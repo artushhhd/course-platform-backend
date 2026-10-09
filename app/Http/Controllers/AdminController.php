@@ -92,6 +92,10 @@ class AdminController extends Controller
 
         $user->update(['is_active' => !$user->is_active]);
 
+        if (! $user->is_active) {
+            $user->tokens()->delete();
+        }
+
         return response()->json([
             'success' => true,
             'is_active' => $user->is_active,
