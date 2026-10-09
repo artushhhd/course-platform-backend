@@ -8,6 +8,7 @@ use App\Http\Requests\CourseRequest;
 use App\Http\Requests\StoreCommentRequest;
 use App\Models\Course;
 use App\Models\CourseComment;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -41,12 +42,7 @@ class CourseController extends Controller
     {
         $user = auth('sanctum')->user();
 
-        if (
-            $course->status !== 'published'
-            && (!$user || ($course->user_id !== $user->id && !$user->isStaff()))
-        ) {
-            abort(404);
-        }
+        $this->ensureVisibleTo($course, $user);
 
         $course->load(['author:id,name', 'comments.user']);
 
@@ -105,9 +101,11 @@ class CourseController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function toggleLike(Course $course): JsonResponse
+    public function toggleLike(Request $request, Course $course): JsonResponse
     {
-        $user = Auth::user();
+        $user = $request->user();
+        $this->ensureVisibleTo($course, $user);
+
         $result = $course->likes()->toggle($user->id);
 
         return response()->json([
@@ -119,6 +117,8 @@ class CourseController extends Controller
 
     public function storeComment(StoreCommentRequest $request, Course $course): JsonResponse
     {
+        $this->ensureVisibleTo($course, $request->user());
+
         $comment = CourseComment::create([
             'user_id' => $request->user()->id,
             'course_id' => $course->id,
@@ -129,6 +129,16 @@ class CourseController extends Controller
             'success' => true,
             'data' => $comment->load('user'),
         ], 201);
+    }
+
+    private function ensureVisibleTo(Course $course, ?User $user): void
+    {
+        if (
+            $course->status !== 'published'
+            && (!$user || ($course->user_id !== $user->id && !$user->isStaff()))
+        ) {
+            abort(404);
+        }
     }
 
     private function uniqueSlug(string $base, ?int $ignoreId = null): string
