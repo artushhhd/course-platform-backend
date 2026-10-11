@@ -76,10 +76,25 @@ class CourseController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            if ($course->image) {
-                Storage::disk('public')->delete($course->image);
+            // Store the replacement first so a failed upload does not remove the current image.
+            $newImage = $request->file('image')->store('courses', 'public');
+
+            if ($newImage === false) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The image could not be stored. Please try again.',
+                ], 500);
             }
-            $data['image'] = $request->file('image')->store('courses', 'public');
+
+            $previousImage = $course->image;
+            $data['image'] = $newImage;
+            $course->update($data);
+
+            if ($previousImage) {
+                Storage::disk('public')->delete($previousImage);
+            }
+
+            return response()->json(['success' => true, 'data' => $course->fresh()]);
         }
 
         $course->update($data);
