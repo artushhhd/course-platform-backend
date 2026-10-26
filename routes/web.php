@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 
 Route::get('/', function () {
     return response()->json([
@@ -13,4 +14,5 @@ Route::get('/', function () {
 })->withoutMiddleware([
     StartSession::class,
     ShareErrorsFromSession::class,
+    PreventRequestForgery::class,
 ]);
