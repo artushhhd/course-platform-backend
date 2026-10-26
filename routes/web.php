@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 Route::get('/', function () {
     return response()->json([
@@ -9,4 +10,7 @@ Route::get('/', function () {
         'message' => 'Course Platform API is running.',
         'health' => url('/up'),
     ]);
-})->withoutMiddleware([StartSession::class]);
+})->withoutMiddleware([
+    StartSession::class,
+    ShareErrorsFromSession::class,
+]);
