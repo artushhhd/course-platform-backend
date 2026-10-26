@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Session\Middleware\StartSession;
 
 Route::get('/', function () {
     return response()->json([
@@ -8,4 +9,4 @@ Route::get('/', function () {
         'message' => 'Course Platform API is running.',
         'health' => url('/up'),
     ]);
-});
+})->withoutMiddleware([StartSession::class]);
